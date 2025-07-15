@@ -17,8 +17,6 @@ app.use((req,res,next) => {
 app.use("/api/v1/tours", tourRouter);
 app.use("/api/v1/users",userRouter);
 
-app.listen(3000, ()=> {
-    console.log("App running on the port 3000...");
-});
+module.exports = app ;
 
 
