@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const { validate } = require("./tourModels");
+const bcrypt = require("bcryptjs");
 
 const userSchema = new mongoose.Schema({
     name:{
@@ -21,8 +22,23 @@ const userSchema = new mongoose.Schema({
     },
     passwordConfirm : {
         type: String,
-        required: true
+        required: true,
+        validate: {
+            validator: function(el){
+                return el === this.password ; //return true if passwordConfirm = password
+            },
+            message:"Different to the password"
+        }
     }
+});
+
+// Hash password before saving
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) return next();
+
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+  next();
 });
 
 const User = mongoose.model('User', userSchema);
