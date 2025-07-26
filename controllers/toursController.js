@@ -5,7 +5,20 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-si
 
 const getAllTours = async (req,res)=> { //get all tours
     try{
-        const tours = await Tour.find();
+        let query = Tour.find();
+
+        if (req.query){
+            query = query.find(req.query);
+        }
+
+        if (req.query.sort) {
+            // ex : ?sort=price,-ratingsAverage
+            const sortBy = req.query.sort.split(',').join(' ');
+            query = query.sort(sortBy);
+        }
+
+        const tours = await query;
+
         res.status(200).json({
         status: "success",
         results: tours.length,
@@ -31,6 +44,33 @@ const getOneTour = async (req,res)=>{ //get one tour
             status: "success",
             data: {
                 tour
+            }
+        });
+    } catch(err) {
+        res.status(400).json({
+            status: "fail",
+            message: err
+        });
+    }
+};
+
+const getTourStat = async (req,res) => {
+    try{
+        const stats = await Tour.aggregate([
+            {
+                $match : {ratingsAverage:{$gte:4.7}}
+            },
+            {
+                $group : {
+                    _id : "$difficulty",
+                    totalPrice : {$sum : "$price"}
+                }
+            }
+        ])
+        res.status(200).json({
+            status: "success",
+            data: {
+                stats
             }
         });
     } catch(err) {
@@ -98,5 +138,6 @@ module.exports = {
     getOneTour,
     createTour,
     updateTour,
-    deleteTour
+    deleteTour,
+    getTourStat
 };

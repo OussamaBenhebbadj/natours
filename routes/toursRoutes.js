@@ -8,7 +8,7 @@ Router.param ('id', (req,res,next,val) => {
     next();
 })
 
-
+Router.route('/stats').get(tourModules.getTourStat);
 Router.route('/').get(tourModules.getAllTours).post(tourModules.createTour);
 Router.route("/:id").get(tourModules.getOneTour).patch(tourModules.updateTour).delete(tourModules.deleteTour);
 
