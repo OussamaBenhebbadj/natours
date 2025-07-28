@@ -10,7 +10,6 @@ mongoose.connect(process.env.DATABASE, {
   useCreateIndex: true,
   useFindAndModify: false
 }).then(con => {
-    console.log(con.connections);
     console.log("✅ Connected to DB");
 });
 
