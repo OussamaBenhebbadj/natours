@@ -1,6 +1,7 @@
 const express = require("express");
 const Router = express.Router();
 const tourModules = require("./../controllers/toursController");
+const authModules = require("./../controllers/authController");
 
 //Param middleware
 Router.param ('id', (req,res,next,val) => {
@@ -9,7 +10,7 @@ Router.param ('id', (req,res,next,val) => {
 })
 
 Router.route('/stats').get(tourModules.getTourStat);
-Router.route('/').get(tourModules.getAllTours).post(tourModules.createTour);
-Router.route("/:id").get(tourModules.getOneTour).patch(tourModules.updateTour).delete(tourModules.deleteTour);
+Router.route('/').get(authModules.protect , tourModules.getAllTours).post(tourModules.createTour);
+Router.route("/:id").get(tourModules.getOneTour).patch(tourModules.updateTour).delete(authModules.protect, authModules.restrictTo('admin', 'lead-guide'), tourModules.deleteTour);
 
 module.exports = Router ;
